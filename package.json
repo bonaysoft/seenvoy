@@ -1,0 +1,23 @@
+{
+  "name": "seenvoy-front",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "ant-design-vue": "^3.2.9",
+    "axios": "^0.27.2",
+    "echarts": "^5.3.3",
+    "unplugin-vue-components": "^0.21.0",
+    "vue": "^3.2.25",
+    "vue-json-viewer": "3",
+    "vue-router": "^4.1.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^2.3.3",
+    "vite": "^2.9.9"
+  }
+}
