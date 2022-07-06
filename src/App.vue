@@ -32,7 +32,7 @@ export default defineComponent({
                 <a-menu-item key="Listeners">Listeners</a-menu-item>
                 <a-menu-item key="Routes">Routes</a-menu-item>
                 <a-menu-item key="Clusters">Clusters</a-menu-item>
-                <a-menu-item key="Endpoints">Endpoints</a-menu-item>
+                <!-- <a-menu-item key="Endpoints">Endpoints</a-menu-item> -->
             </a-menu>
         </a-layout-header>
         <a-layout-content style="padding: 0">

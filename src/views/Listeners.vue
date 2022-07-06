@@ -1,6 +1,6 @@
 <script >
 import { onMounted, onUnmounted } from '@vue/runtime-core';
-import { clusters, config_dump, listenerConfigs } from '../libs/envoy';
+import { listenerConfigs } from '../libs/envoy';
 import { defineComponent, ref } from 'vue';
 import { useSankey } from '../libs/echarts';
 import { openDrawer } from '~/libs/drawer';
@@ -18,16 +18,7 @@ export default defineComponent({
           return el
         })
       });
-      // clusters().then(console.log);
     });
-
-    onUnmounted(() => {
-      // echart.dispose;
-    });
-
-    const handleChange = (e) => {
-      console.log(e);
-    };
 
     const inner_format = (ln) => {
       console.log(ln);
@@ -64,7 +55,6 @@ export default defineComponent({
       search: ref({}),
       listeners: ref([]),
       clusters: ref([]),
-      handleChange,
       openJSONDrawer,
       onDestinationClick,
       inner_format,
@@ -136,7 +126,7 @@ export default defineComponent({
         </template>
       </template>
       <template #expandedRowRender="{ record }">
-        <a-table :columns="innerColumns" :data-source="inner_format(record)" :pagination="false">
+        <a-table size="small" :columns="innerColumns" :data-source="inner_format(record)" :pagination="false">
           <template #bodyCell="{ column, record }">
             <template v-if="column.key === 'destination'">
               <a @click="onDestinationClick(record)">{{ record.destination }}</a>

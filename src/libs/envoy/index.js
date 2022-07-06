@@ -1,11 +1,16 @@
 import axios from "./axios";
 
-export const config_dump = async () => {
-    return (await axios.get('/config_dump?include_eds')).data.configs
+export const config_dump = async (include_eds) => {
+    let url = "/config_dump";
+    if (include_eds) {
+        url += "?include_eds";
+    }
+
+    return (await axios.get(url)).data.configs
 }
 
 export const statistic = async () => {
-    const res = await config_dump();
+    const res = await config_dump(true);
     const lcd = res.find(d => d["@type"].endsWith("ListenersConfigDump"))
     const rcd = res.find(d => d["@type"].endsWith("v3.RoutesConfigDump"))
     const ccd = res.find(d => d["@type"].endsWith("v3.ClustersConfigDump"))
@@ -56,10 +61,26 @@ export const clusterConfigs = async () => {
     return configs
 }
 
+export const endpointConfigs = async () => {
+    const res = await config_dump(true);
+    const ecd = res.find(d => d["@type"].endsWith("v3.EndpointsConfigDump"))
+    console.log(ecd);
+
+    const configs = [];
+    ecd.static_endpoint_configs.forEach(item => { configs.push(item.endpoint_config) })
+    ecd.dynamic_endpoint_configs.forEach(item => { configs.push(item.endpoint_config) })
+    return configs
+}
+
 export const listeners = async () => {
     return (await axios.get('/listeners?format=json')).data.listener_statuses;
 }
 
-export const clusters = async () => {
+export const clusterStatuses = async () => {
     return (await axios.get('/clusters?format=json')).data.cluster_statuses;
+}
+
+export const buildEndpointName = (endpoint) => {
+    const addr = endpoint.address;
+    return addr.socket_address ? `${addr.socket_address.address}:${addr.socket_address.port_value}` : addr.pipe.path
 }

@@ -6,10 +6,10 @@
                     <a-statistic title="Listeners" :value="stats.listeners.dynamic" style="margin-right: 50px" />
                 </a-col>
                 <a-col :span="4">
-                    <a-statistic title="Clusters" :value="stats.clusters.dynamic" style="margin-right: 50px" />
+                    <a-statistic title="Routes" :value="stats.routes.dynamic" style="margin-right: 50px" />
                 </a-col>
                 <a-col :span="4">
-                    <a-statistic title="Routes" :value="stats.routes.dynamic" style="margin-right: 50px" />
+                    <a-statistic title="Clusters" :value="stats.clusters.dynamic" style="margin-right: 50px" />
                 </a-col>
                 <a-col :span="4">
                     <a-statistic title="Endpoints" :value="stats.endpoints.dynamic" style="margin-right: 50px" />
@@ -56,7 +56,10 @@ export default defineComponent({
         });
         const infos = ref([]);
         onMounted(() => {
-            statistic().then(data => { stats.value = data })
+            statistic().then(data => {
+                console.log(data);
+                stats.value = data
+            })
             bootstrapConfig().then(data => {
                 console.log(data);
 
