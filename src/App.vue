@@ -1,28 +1,47 @@
+<script>
+import { defineComponent, watch, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+export default defineComponent({
+    setup() {
+        const route = useRoute();
+        const router = useRouter();
+        const handleClick = (e) => {
+            router.push({ name: e.key })
+        };
+
+        const selectedKeys = ref([]);
+        watch(route, (to) => {
+            selectedKeys.value = [to.name]
+        })
+        return {
+            selectedKeys,
+            handleClick,
+        };
+    },
+});
+</script>
+
 <template>
     <a-layout class="layout" :style="{ height: '100vh', overflow: 'auto' }">
         <a-layout-header>
             <div class="logo">Seenvoy</div>
 
-
+            <a-menu theme="dark" mode="horizontal" :style="{ lineHeight: '64px' }" v-model:selectedKeys="selectedKeys"
+                @click="handleClick">
+                <a-menu-item key="Overview">Overview</a-menu-item>
+                <a-menu-item key="Listeners">Listeners</a-menu-item>
+                <a-menu-item key="Routes">Routes</a-menu-item>
+                <a-menu-item key="Clusters">Clusters</a-menu-item>
+                <a-menu-item key="Endpoints">Endpoints</a-menu-item>
+            </a-menu>
         </a-layout-header>
         <a-layout-content style="padding: 0">
-            <div :style="{ background: '#fff', height: '100vh' }">
+            <div :style="{ background: '#fff' }">
                 <router-view></router-view>
             </div>
         </a-layout-content>
     </a-layout>
 </template>
-<script>
-import { defineComponent, ref } from 'vue';
-export default defineComponent({
-    setup() {
-        return {
-            selectedKeys: ref(['2']),
-        };
-    },
-
-});
-</script>
 <style>
 html,
 body {
