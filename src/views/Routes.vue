@@ -1,20 +1,26 @@
 <script >
-import { onMounted, onUnmounted } from '@vue/runtime-core';
+import { onMounted, onUnmounted, watch } from '@vue/runtime-core';
 import { routeConfigs } from '../libs/envoy';
 import { defineComponent, ref } from 'vue';
 import { useSankey } from '../libs/echarts';
 import { openDrawer } from '~/libs/drawer';
 import JSONViewer from '../components/JSONViewer.vue';
+import { useRoute } from 'vue-router';
 export default defineComponent({
   setup() {
+    const route = useRoute();
     const dataSource = ref([])
-    onMounted(() => {
+    const dataRefresh = (search) => {
+      console.log(search);
       routeConfigs().then(data => {
+        data = search.name ? data.filter(el => el.name == search.name) : data
         dataSource.value = data.map((el, idx) => { el.key = idx; return el })
       });
-    });
+    }
 
-
+    onMounted(() => dataRefresh(route.query));
+    watch(route, (to) => dataRefresh(to.query))
+    const onSearch = (search) => dataRefresh(search)
     const inner_format = (ln) => {
       console.log(ln);
       let data = [];
@@ -43,6 +49,7 @@ export default defineComponent({
       listeners: ref([]),
       clusters: ref([]),
       openJSONDrawer,
+      onSearch,
       onDestinationClick,
       inner_format,
       dataSource,
@@ -69,6 +76,12 @@ export default defineComponent({
         title: 'Routes',
         dataIndex: 'routes',
       }],
+      pagination: {
+        pageSize: 50,
+        showSizeChanger: true,
+        pageSizeOptions: ["10", "20", "50", "100"],
+        showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
+      },
     };
   },
 });
@@ -78,20 +91,15 @@ export default defineComponent({
 <template>
   <div style="height: 100%">
     <a-form layout="inline" :model="search">
-      <a-form-item label="Listener">
-        <a-select ref="select" style="width: 120px" v-model:value="search.listener" :options="listeners">
-        </a-select>
-      </a-form-item>
-      <a-form-item label="Cluster">
-        <a-select ref="select" style="width: 120px" v-model:value="search.cluster" :options="clusters">
-        </a-select>
+      <a-form-item label="Name">
+        <a-input style="width: 120px" v-model:value="search.name"> </a-input>
       </a-form-item>
       <a-form-item>
-        <a-button type="primary">Search</a-button>
+        <a-button type="primary" @click="onSearch(search)">Search</a-button>
       </a-form-item>
     </a-form>
 
-    <a-table :dataSource="dataSource" :columns="columns">
+    <a-table :dataSource="dataSource" :columns="columns" :pagination="pagination" :defaultExpandedRowKeys="[0]">
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
           <a @click="openJSONDrawer(record)">View</a>

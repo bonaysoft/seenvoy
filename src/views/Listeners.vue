@@ -2,9 +2,9 @@
 import { onMounted, onUnmounted } from '@vue/runtime-core';
 import { listenerConfigs } from '../libs/envoy';
 import { defineComponent, ref } from 'vue';
-import { useSankey } from '../libs/echarts';
 import { openDrawer } from '~/libs/drawer';
 import JSONViewer from '../components/JSONViewer.vue';
+import { useRouter } from 'vue-router';
 export default defineComponent({
   setup() {
     const dataSource = ref([])
@@ -47,8 +47,10 @@ export default defineComponent({
       })
     }
 
+    const router = useRouter();
     const onDestinationClick = (row) => {
       console.log(row);
+      router.push({ name: `${row.totype}s`, query: { name: row.destination } })
     }
 
     return {
@@ -97,7 +99,13 @@ export default defineComponent({
         dataIndex: 'destination',
         key: 'destination',
       }],
-    };
+      pagination: {
+        pageSize: 50,
+        showSizeChanger: true,
+        pageSizeOptions: ["10", "20", "50", "100"],
+        showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
+      },
+    }
   },
 });
 
@@ -119,7 +127,7 @@ export default defineComponent({
       </a-form-item>
     </a-form>
 
-    <a-table :dataSource="dataSource" :columns="columns">
+    <a-table :dataSource="dataSource" :columns="columns" :pagination="pagination">
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
           <a @click="openJSONDrawer(record)">View</a>
