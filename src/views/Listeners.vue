@@ -20,6 +20,33 @@ export default defineComponent({
       });
     });
 
+    const matchFormat = (filter_chain_match) => {
+      if (!filter_chain_match || Object.keys(filter_chain_match) == 0) return 'ALL'
+
+      const keyFormats = {
+        'transport_protocol': 'Trans',
+        'application_protocols': 'App',
+        'server_names': 'SNI',
+        'prefix_ranges': 'Addr',
+        'destination_port': 'DestPort',
+      }
+      let matchArr = []
+      Object.keys(filter_chain_match).forEach(key => {
+        let value = filter_chain_match[key]
+        if (key == 'prefix_ranges') {
+          let addr = []
+          filter_chain_match[key].forEach(el => {
+            addr.push(`${el.address_prefix}/${el.prefix_len}`)
+          });
+          value = addr.join(',')
+        }
+
+        matchArr.push(`${keyFormats[key] || key}: ${value}`)
+      });
+
+      return matchArr.join('; ')
+    }
+
     const inner_format = (ln) => {
       console.log(ln);
       let data = [];
@@ -28,13 +55,11 @@ export default defineComponent({
       }
       data.push(...ln.filter_chains)
       return data.map(el => {
-        const match = el.filter_chain_match ? `Trans: ${el.filter_chain_match.transport_protocol}; App: ${el.filter_chain_match.application_protocols?.join(',')}` : 'ALL'
         const finalFilter = el.filters.at(-1)
         const cfg = finalFilter.typed_config
-
         return {
           name: finalFilter.name,
-          match,
+          match: matchFormat(el.filter_chain_match),
           totype: cfg.cluster ? 'Cluster' : 'Route',
           destination: cfg.cluster || (cfg.route_config ? cfg.route_config.name : cfg.rds.route_config_name)
         }
@@ -100,7 +125,8 @@ export default defineComponent({
         key: 'destination',
       }],
       pagination: {
-        pageSize: 50,
+        total: dataSource.value.length,
+        pageSize: 20,
         showSizeChanger: true,
         pageSizeOptions: ["10", "20", "50", "100"],
         showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
