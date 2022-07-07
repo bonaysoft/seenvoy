@@ -5,7 +5,7 @@ import { defineComponent, ref } from 'vue';
 import { useSankey } from '../libs/echarts';
 import { openDrawer } from '~/libs/drawer';
 import JSONViewer from '../components/JSONViewer.vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 export default defineComponent({
   setup() {
     const route = useRoute();
@@ -25,11 +25,23 @@ export default defineComponent({
       console.log(ln);
       let data = [];
       data.push(...ln.virtual_hosts)
-      return data.map(el => {
+      return data.map((el, idx) => {
         return {
+          key: idx,
           name: el.name,
           domains: el.domains.join(','),
-          routes: el.routes.length
+          routes: el.routes,
+          routesCount: el.routes.length
+        }
+      })
+    }
+    const routeFormat = (routes) => {
+      return routes.map((route, idx) => {
+        return {
+          key: idx,
+          name: route.name,
+          match: Object.keys(route.match).map(key => `${key}: ${route.match[key]}`).join(','),
+          route: route.route,
         }
       })
     }
@@ -40,8 +52,9 @@ export default defineComponent({
       })
     }
 
-    const onDestinationClick = (row) => {
-      console.log(row);
+    const router = useRouter();
+    const onDestinationClick = (cluster) => {
+      router.push({ name: 'Clusters', query: { name: cluster } })
     }
 
     return {
@@ -52,6 +65,7 @@ export default defineComponent({
       onSearch,
       onDestinationClick,
       inner_format,
+      routeFormat,
       dataSource,
       columns: [
         {
@@ -71,11 +85,35 @@ export default defineComponent({
       {
         title: 'Domains',
         dataIndex: 'domains',
+        ellipsis: true,
       },
       {
         title: 'Routes',
-        dataIndex: 'routes',
+        dataIndex: 'routesCount',
+        width: 80,
       }],
+      routeColumns: [
+        {
+          title: 'Name',
+          dataIndex: 'name',
+          key: 'name',
+        },
+        {
+          title: 'Match',
+          dataIndex: 'match',
+        },
+        {
+          title: 'DestCluster',
+          dataIndex: ['route', 'cluster'],
+          key: 'destination',
+        },
+        {
+          title: 'Timeout',
+          dataIndex: ['route', 'timeout'],
+          key: 'timeout',
+          width: 80,
+        },
+      ],
       pagination: {
         pageSize: 50,
         showSizeChanger: true,
@@ -107,28 +145,14 @@ export default defineComponent({
       </template>
       <template #expandedRowRender="{ record }">
         <a-table size="small" :columns="innerColumns" :data-source="inner_format(record)" :pagination="false">
-          <template #bodyCell="{ column, record }">
-            <template v-if="column.key === 'destination'">
-              <a @click="onDestinationClick(record)">{{ record.destination }}</a>
-            </template>
-            <template v-else-if="column.key === 'operation'">
-              <span class="table-operation">
-                <a>Pause</a>
-                <a>Stop</a>
-                <a-dropdown>
-                  <template #overlay>
-                    <a-menu>
-                      <a-menu-item>Action 1</a-menu-item>
-                      <a-menu-item>Action 2</a-menu-item>
-                    </a-menu>
-                  </template>
-                  <a>
-                    More
-                    <down-outlined />
-                  </a>
-                </a-dropdown>
-              </span>
-            </template>
+          <template #expandedRowRender="{ record }">
+            <a-table size="small" :columns="routeColumns" :data-source="routeFormat(record.routes)" :pagination="false">
+              <template #bodyCell="{ column, record }">
+                <template v-if="column.key === 'destination'">
+                  <a @click="onDestinationClick(record.route.cluster)">{{ record.route.cluster }}</a>
+                </template>
+              </template>
+            </a-table>
           </template>
         </a-table>
       </template>
