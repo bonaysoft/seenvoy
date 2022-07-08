@@ -1,6 +1,6 @@
-import { build, dispose } from "./sankey"
+import { build, dispose } from "./graph"
 
-export const useSankey = () => {
+export const useGraph = () => {
     return {
         build,
         dispose
