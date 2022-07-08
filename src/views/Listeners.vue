@@ -4,6 +4,7 @@ import { listenerConfigs } from '../libs/envoy';
 import { defineComponent, ref } from 'vue';
 import { openDrawer } from '~/libs/drawer';
 import JSONViewer from '../components/JSONViewer.vue';
+import Graph from '../components/Graph.vue';
 import { useRouter } from 'vue-router';
 export default defineComponent({
   setup() {
@@ -66,9 +67,10 @@ export default defineComponent({
       })
     }
 
-    const openJSONDrawer = (row) => {
-      openDrawer(JSONViewer, {
-        jsondata: row
+    const openDrawerWith = (type, row) => {
+      const components = { json: JSONViewer, graph: Graph }
+      openDrawer(components[type], {
+        modelValue: row
       })
     }
 
@@ -82,7 +84,7 @@ export default defineComponent({
       search: ref({}),
       listeners: ref([]),
       clusters: ref([]),
-      openJSONDrawer,
+      openDrawerWith,
       onDestinationClick,
       inner_format,
       dataSource,
@@ -156,7 +158,10 @@ export default defineComponent({
     <a-table :dataSource="dataSource" :columns="columns" :pagination="pagination">
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
-          <a @click="openJSONDrawer(record)">View</a>
+          <a-space>
+            <a @click="openDrawerWith('json', record)">View</a>
+            <a @click="openDrawerWith('graph', record)">Graph</a>
+          </a-space>
         </template>
       </template>
       <template #expandedRowRender="{ record }">

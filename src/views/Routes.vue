@@ -2,7 +2,6 @@
 import { onMounted, onUnmounted, watch } from '@vue/runtime-core';
 import { routeConfigs } from '../libs/envoy';
 import { defineComponent, ref } from 'vue';
-import { useSankey } from '../libs/echarts';
 import { openDrawer } from '~/libs/drawer';
 import JSONViewer from '../components/JSONViewer.vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -48,7 +47,7 @@ export default defineComponent({
 
     const openJSONDrawer = (row) => {
       openDrawer(JSONViewer, {
-        jsondata: row
+        modelValue: row
       })
     }
 

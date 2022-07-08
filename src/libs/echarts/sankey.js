@@ -37,7 +37,6 @@ const buildSankeyLinks = (raw_data) => {
 export const build = (domid, data) => {
     var dom = document.getElementById(domid);
     var chart = echarts.init(dom);
-    var app = {};
     var option;
 
     console.log(data);
@@ -50,11 +49,13 @@ export const build = (domid, data) => {
                 trigger: 'item',
                 triggerOn: 'mousemove'
             },
+            // animation: false,
             series: [
                 {
                     type: 'sankey',
-                    data: buildSankeyData(data),
-                    links: buildSankeyLinks(data),
+                    // orient: 'vertical',
+                    data: data.data,
+                    links: data.links,
                     emphasis: {
                         focus: 'adjacency'
                     },
@@ -117,4 +118,8 @@ export const build = (domid, data) => {
         //自适应大小
         chart.resize();
     };
+}
+
+export const dispose = () => {
+    echarts.dispose()
 }

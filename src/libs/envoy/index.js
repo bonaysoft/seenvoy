@@ -72,6 +72,44 @@ export const endpointConfigs = async () => {
     return configs
 }
 
+export class Configs {
+    configs;
+    constructor(configs) {
+        this.configs = configs
+    }
+    getBootstrapConfig() {
+        return this.configs.find(d => d["@type"].endsWith("BootstrapConfigDump")).bootstrap
+    }
+    getListenerConfigs() {
+        const lcd = this.configs.find(d => d["@type"].endsWith("ListenersConfigDump"))
+        const configs = [];
+        lcd.static_listeners.forEach(ln => { configs.push(ln.listener) })
+        lcd.dynamic_listeners.forEach(item => { configs.push(item.active_state.listener) })
+        return configs
+    }
+    getRouteConfigs() {
+        const rcd = this.configs.find(d => d["@type"].endsWith("v3.RoutesConfigDump"))
+        const configs = [];
+        rcd.static_route_configs.forEach(item => { configs.push(item.route_config) })
+        rcd.dynamic_route_configs.forEach(item => { configs.push(item.route_config) })
+        return configs
+    }
+    getClusterConfigs() {
+        const ccd = this.configs.find(d => d["@type"].endsWith("v3.ClustersConfigDump"))
+        const configs = [];
+        ccd.static_clusters.forEach(item => { configs.push(item.cluster) })
+        ccd.dynamic_active_clusters.forEach(item => { configs.push(item.cluster) })
+        return configs
+    }
+    getEndpointConfigs() {
+        const ecd = this.configs.find(d => d["@type"].endsWith("v3.EndpointsConfigDump"))
+        const configs = [];
+        ecd.static_endpoint_configs.forEach(item => { configs.push(item.endpoint_config) })
+        ecd.dynamic_endpoint_configs.forEach(item => { configs.push(item.endpoint_config) })
+        return configs
+    }
+}
+
 export const listeners = async () => {
     return (await axios.get('/listeners?format=json')).data.listener_statuses;
 }
@@ -84,3 +122,5 @@ export const buildEndpointName = (endpoint) => {
     const addr = endpoint.address;
     return addr.socket_address ? `${addr.socket_address.address}:${addr.socket_address.port_value}` : addr.pipe.path
 }
+
+export * from "./relation";

@@ -1,33 +1,47 @@
 <script >
-import { onMounted, onUnmounted } from '@vue/runtime-core';
-import { clusters, config_dump, listeners } from '../libs/envoy';
 import { defineComponent, ref } from 'vue';
+import { onMounted, onUnmounted } from '@vue/runtime-core';
+import { config_dump, useConfigRelationship } from '../libs/envoy';
 import { useSankey } from '../libs/echarts';
 export default defineComponent({
-  setup() {
+  props: {
+    modelValue: Object,
+    close: Function,
+  },
+  setup(props) {
     const sankey = useSankey();
-    onMounted(() => {
-      config_dump().then((data) => {
-        sankey.build("container", data);
+    onMounted(async () => {
+      console.log(112233, props.modelValue);
+      const cfg = props.modelValue;
+      const cd = await config_dump(true)
+      const rdata = useConfigRelationship(cfg, cd);
+      console.log(2233, rdata);
+
+      let tMap = {}
+      rdata.forEach(el => {
+        tMap[el.target] = 1;
+        tMap[el.source] = 1;
       });
-      
-      listeners().then(console.log);
-      clusters().then(console.log);
+      console.log(12311, tMap);
+      let data = Object.keys(tMap).map(key => { return { name: key } })
+      console.log(12311, data);
+
+      sankey.build("container", { data: data, links: rdata });
     });
 
     onUnmounted(() => {
-      // echart.dispose;
+      sankey.dispose();
     });
 
-    const handleChange = (e) => {
-      console.log(e);
-    };
+    const drawerVisible = ref(true)
+    const onClose = () => {
+      drawerVisible.value = false
+      props.close()
+    }
 
     return {
-      search: ref({}),
-      listeners: ref([]),
-      clusters: ref([]),
-      handleChange,
+      drawerVisible,
+      onClose
     };
   },
 });
@@ -35,23 +49,9 @@ export default defineComponent({
 </script>
 
 <template>
-  <div style="height: 100%">
-    <a-form layout="inline" :model="search">
-      <a-form-item label="Listener">
-        <a-select ref="select" style="width: 120px" v-model:value="search.listener" :options="listeners">
-        </a-select>
-      </a-form-item>
-      <a-form-item label="Cluster">
-        <a-select ref="select" style="width: 120px" v-model:value="search.cluster" :options="clusters">
-        </a-select>
-      </a-form-item>
-      <a-form-item>
-        <a-button type="primary">Search</a-button>
-      </a-form-item>
-    </a-form>
-
+  <a-drawer title="Graph" size="large" :visible="drawerVisible" @close="onClose" width="950" destroyOnClose>
     <div id="container" style="height: 100%"></div>
-  </div>
+  </a-drawer>
 </template>
 
 <style>

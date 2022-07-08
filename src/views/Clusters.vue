@@ -46,7 +46,7 @@ export default defineComponent({
 
     const openJSONDrawer = (row) => {
       openDrawer(JSONViewer, {
-        jsondata: row
+        modelValue: row
       })
     }
 

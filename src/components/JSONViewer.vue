@@ -6,15 +6,17 @@ export default {
         JsonViewer,
     },
     props: {
-        jsondata: Object
+        modelValue: Object,
+        close: Function,
     },
     setup(props) {
         const drawerVisible = ref(true)
         const onClose = () => {
             drawerVisible.value = false
+            props.close()
         }
 
-        console.log(112233, props.jsondata);
+        console.log(112233, props.modelValue);
         return {
             drawerVisible,
             onClose
@@ -24,8 +26,8 @@ export default {
 </script>
 
 <template>
-    <a-drawer title="JSONViewer" size="large" :visible="drawerVisible" @close="onClose" width="950">
-        <json-viewer :value="jsondata" :expand-depth="5" copyable sort></json-viewer>
+    <a-drawer title="JSONViewer" size="large" :visible="drawerVisible" @close="onClose" width="950" destroyOnClose>
+        <json-viewer :value="modelValue" :expand-depth="5" copyable sort></json-viewer>
     </a-drawer>
 </template>
 

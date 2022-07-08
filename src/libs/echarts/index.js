@@ -1,7 +1,8 @@
-import { build } from "./sankey"
+import { build, dispose } from "./sankey"
 
 export const useSankey = () => {
     return {
         build,
+        dispose
     }
 }
