@@ -22,8 +22,8 @@ export default defineComponent({
 </script>
 
 <template>
-    <a-layout class="layout" :style="{ height: '100vh', overflow: 'auto' }">
-        <a-layout-header>
+    <a-layout class="layout">
+        <a-layout-header :style="{ position: 'fixed', zIndex: 1, width: '100%' }">
             <div class="logo">Seenvoy</div>
 
             <a-menu theme="dark" mode="horizontal" :style="{ lineHeight: '64px' }" v-model:selectedKeys="selectedKeys"
@@ -35,8 +35,8 @@ export default defineComponent({
                 <!-- <a-menu-item key="Endpoints">Endpoints</a-menu-item> -->
             </a-menu>
         </a-layout-header>
-        <a-layout-content style="padding: 0">
-            <div :style="{ background: '#fff' }">
+        <a-layout-content :style="{ padding: '0 50px', marginTop: '84px' }">
+            <div :style="{ background: '#fff', padding: '24px', minHeight: '900px' }">
                 <router-view></router-view>
             </div>
         </a-layout-content>
@@ -59,10 +59,6 @@ body {
     /* margin-top: 60px; */
 }
 
-#app .ant-layout-header {
-    padding: 0 10px;
-}
-
 #app .logo {
     float: left;
     color: #fff;
@@ -76,7 +72,4 @@ body {
     margin: 16px 0 16px 24px;
 }
 
-[data-theme='dark'] .site-layout-content {
-    background: #141414;
-}
 </style>

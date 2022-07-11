@@ -29,7 +29,7 @@ brew install saltbo/bin/seenvoy
 
 ## Usage
 ```
-seenvoy serve -p 8080 -t http://localhost:15000
+seenvoy -t http://localhost:15000
 ```
 
 ## Develop

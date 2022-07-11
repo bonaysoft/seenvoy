@@ -1,33 +1,3 @@
-<template>
-    <div class="container">
-        <a-card title="Overview" class="overview" :bordered="false" :headStyle="{ padingLeft: 0 }">
-            <a-row>
-                <a-col :span="4">
-                    <a-statistic title="Listeners" :value="stats.listeners.dynamic" style="margin-right: 50px" />
-                </a-col>
-                <a-col :span="4">
-                    <a-statistic title="Routes" :value="stats.routes.dynamic" style="margin-right: 50px" />
-                </a-col>
-                <a-col :span="4">
-                    <a-statistic title="Clusters" :value="stats.clusters.dynamic" style="margin-right: 50px" />
-                </a-col>
-                <a-col :span="4">
-                    <a-statistic title="Endpoints" :value="stats.endpoints.dynamic" style="margin-right: 50px" />
-                </a-col>
-            </a-row>
-        </a-card>
-        <a-card v-for="(info, idx) in infos" :key="idx" :title="info.title" :bordered="false">
-            <a-descriptions :column="1" bordered>
-                <a-descriptions-item v-for="(row, key) in info.rows" :key="key" :label="row.name">
-                    <json-viewer v-if="typeof row.value === 'object'" :value="row.value" :expand-depth="5">
-                    </json-viewer>
-                    <span v-else>{{ row.value }}</span>
-                </a-descriptions-item>
-            </a-descriptions>
-        </a-card>
-    </div>
-</template>
-
 <script>
 import { defineComponent, onMounted, ref } from "@vue/runtime-core";
 import { bootstrapConfig, statistic } from "../libs/envoy";
@@ -80,9 +50,39 @@ export default defineComponent({
 
 </script>
 
+<template>
+    <div class="container">
+        <a-card title="Overview" class="overview" :bordered="false" :headStyle="{ padingLeft: 0 }">
+            <a-row>
+                <a-col :span="4">
+                    <a-statistic title="Listeners" :value="stats.listeners.dynamic" style="margin-right: 50px" />
+                </a-col>
+                <a-col :span="4">
+                    <a-statistic title="Routes" :value="stats.routes.dynamic" style="margin-right: 50px" />
+                </a-col>
+                <a-col :span="4">
+                    <a-statistic title="Clusters" :value="stats.clusters.dynamic" style="margin-right: 50px" />
+                </a-col>
+                <a-col :span="4">
+                    <a-statistic title="Endpoints" :value="stats.endpoints.dynamic" style="margin-right: 50px" />
+                </a-col>
+            </a-row>
+        </a-card>
+        <a-card v-for="(info, idx) in infos" :key="idx" :title="info.title" :bordered="false">
+            <a-descriptions :column="1" bordered>
+                <a-descriptions-item v-for="(row, key) in info.rows" :key="key" :label="row.name">
+                    <json-viewer v-if="typeof row.value === 'object'" :value="row.value" :expand-depth="5">
+                    </json-viewer>
+                    <span v-else>{{ row.value }}</span>
+                </a-descriptions-item>
+            </a-descriptions>
+        </a-card>
+    </div>
+</template>
+
 <style scoped>
-.container {
+/* .container {
     width: 800px;
     margin: 0 auto;
-}
+} */
 </style>
