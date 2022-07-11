@@ -1,6 +1,8 @@
 # Seenvoy
 
-See the configs of the [Envoy](https://github.com/envoyproxy/envoy)
+[![Build](https://github.com/saltbo/seenvoy/actions/workflows/build.yml/badge.svg)](https://github.com/saltbo/seenvoy/actions/workflows/build.yml)
+
+Let's see the configs of the [Envoy](https://github.com/envoyproxy/envoy)
 
 ## Feature
 
@@ -13,6 +15,9 @@ See the configs of the [Envoy](https://github.com/envoyproxy/envoy)
 ## Installation
 
 ### For go developer
+
+> required go1.17
+
 ```go
 go install github.com/saltbo/seenvoy@latest
 ```
@@ -26,7 +31,6 @@ brew install saltbo/bin/seenvoy
 ```
 seenvoy serve -p 8080 -t http://localhost:15000
 ```
-
 
 ## Develop
 ```
