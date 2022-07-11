@@ -1,0 +1,58 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  release:
+    strategy:
+      matrix:
+        build_target: [linux-x86_64, macos-x86_64, windows-x86_64]
+        include:
+          - build_target: linux-x86_64
+            os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - build_target: macos-x86_64
+            os: macos-latest
+            target: x86_64-apple-darwin
+          - build_target: windows-x86_64
+            os: windows-latest
+            target: x86_64-pc-windows-msvc
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v1
+      - name: Setup Node.js
+        uses: actions/setup-node@v3.3.0
+        with:
+          node-version: 14
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.17
+      - name: Build
+        run: yarn && yarn build && go build
+      - name: Extract git tag
+        shell: bash
+        run: echo "##[set-output name=tag;]$(echo ${GITHUB_REF#refs/tags/})"
+        id: extract_tag
+      - name: Packaging assets
+        shell: bash
+        run: |
+          cd target/${{ matrix.target }}/release
+          case ${{ matrix.target }} in
+          *-pc-windows-*) 
+            7z -y a rslocal-${{ steps.extract_tag.outputs.tag }}-${{ matrix.build_target }}.zip seenvoy.exe
+            sha256sum rslocal-${{ steps.extract_tag.outputs.tag }}-${{ matrix.build_target }}.zip > seenvoy-${{ steps.extract_tag.outputs.tag }}-${{ matrix.build_target }}.sha256
+            ;;
+          *) 
+            tar czvf rslocal-${{ steps.extract_tag.outputs.tag }}-${{ matrix.build_target }}.tar.gz seenvoy
+            shasum -a 256 rslocal-${{ steps.extract_tag.outputs.tag }}-${{ matrix.build_target }}.tar.gz > seenvoy-${{ steps.extract_tag.outputs.tag }}-${{ matrix.build_target }}.sha256
+            ;;
+          esac;
+      - name: Releasing assets
+        uses: softprops/action-gh-release@v1
+        with:
+          files: target/${{ matrix.target }}/release/seenvoy-*
