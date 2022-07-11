@@ -55,4 +55,4 @@ jobs:
       - name: Releasing assets
         uses: softprops/action-gh-release@v1
         with:
-          files: target/${{ matrix.target }}/release/seenvoy-*
+          files: build/${{ matrix.target }}/seenvoy-*
