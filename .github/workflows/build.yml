@@ -3,8 +3,6 @@ name: Build
 on:
   push:
     branches: [ "master" ]
-    tags:
-      - '*'
   pull_request:
     branches: [ "master" ]
 
@@ -25,9 +23,3 @@ jobs:
 
     - name: Build
       run: yarn && yarn build && go build
-    
-    - name: Release
-      uses: softprops/action-gh-release@v1
-      if: startsWith(github.ref, 'refs/tags/')
-      with:
-        files: seenvoy
