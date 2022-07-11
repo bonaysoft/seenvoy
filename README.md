@@ -37,6 +37,12 @@ brew install saltbo/bin/seenvoy
 
 ## Usage
 ```
+seenvoy -t http://localhost:9901
+```
+
+### For istio users
+```
+istioctl dashboard envoy productpage-v1-78b54d859b-lsjd9
 seenvoy -t http://localhost:15000
 ```
 
