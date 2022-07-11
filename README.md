@@ -1,7 +1,42 @@
-# Vue 3 + Vite
+# Seenvoy
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+See the configs of the [Envoy](https://github.com/envoyproxy/envoy)
 
-## Recommended IDE Setup
+## Feature
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
+- Visualization configuration
+- Visualization the relation of config
+
+## Preview
+
+
+## Installation
+
+### For go developer
+```go
+go install github.com/saltbo/seenvoy@latest
+```
+
+### For Homebrew users
+```go
+brew install saltbo/bin/seenvoy
+```
+
+## Usage
+```
+seenvoy serve -p 8080 -t http://localhost:15000
+```
+
+
+## Develop
+```
+yarn
+yarn dev
+```
+
+## Build
+```shell
+yarn
+yarn build
+go build -o seenvoy .
+```
