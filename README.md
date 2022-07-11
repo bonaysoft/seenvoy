@@ -22,18 +22,13 @@ Routes
 
 ## Installation
 
-### For go developer
-
-> required go1.17
-
-```go
-go install github.com/saltbo/seenvoy@latest
-```
-
-### For Homebrew users
+### Recommand
 ```go
 brew install saltbo/bin/seenvoy
 ```
+
+### Manually
+Navigate to [release](https://github.com/saltbo/seenvoy/releases) download
 
 ## Usage
 ```
