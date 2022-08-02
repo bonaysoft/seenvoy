@@ -1,25 +1,18 @@
 <script >
 import { onMounted, onUnmounted, watch } from '@vue/runtime-core';
 import { routeConfigs } from '../libs/envoy';
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, computed } from 'vue';
 import { openDrawer } from '~/libs/drawer';
 import JSONViewer from '../components/JSONViewer.vue';
 import { useRoute, useRouter } from 'vue-router';
+import { usePaginationS } from '~/libs/pagination';
 export default defineComponent({
   setup() {
-    const route = useRoute();
-    const dataSource = ref([])
-    const dataRefresh = (search) => {
-      console.log(search);
-      routeConfigs().then(data => {
-        data = search.name ? data.filter(el => el.name == search.name) : data
-        dataSource.value = data.map((el, idx) => { el.key = idx; return el })
-      });
-    }
-
-    onMounted(() => dataRefresh(route.query));
-    watch(route, (to) => dataRefresh(to.query))
-    const onSearch = (search) => dataRefresh(search)
+    const { data, pagination, handleTableChange, run } = usePaginationS(routeConfigs)
+    const onSearch = (search) => run(search)
+    const dataSource = computed(() => {
+      return data.value?.items.map((el, idx) => { el.key = idx; return el })
+    });
     const inner_format = (ln) => {
       console.log(ln);
       let data = [];
@@ -113,12 +106,8 @@ export default defineComponent({
           width: 80,
         },
       ],
-      pagination: {
-        pageSize: 50,
-        showSizeChanger: true,
-        pageSizeOptions: ["10", "20", "50", "100"],
-        showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
-      },
+      pagination,
+      handleTableChange
     };
   },
 });
@@ -136,7 +125,8 @@ export default defineComponent({
       </a-form-item>
     </a-form>
 
-    <a-table :dataSource="dataSource" :columns="columns" :pagination="pagination" :defaultExpandedRowKeys="[0]">
+    <a-table :dataSource="dataSource" :columns="columns" :pagination="pagination" :defaultExpandedRowKeys="[0]"
+      @change="handleTableChange">
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
           <a @click="openJSONDrawer(record)">View</a>

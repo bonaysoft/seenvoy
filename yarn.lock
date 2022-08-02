@@ -332,6 +332,11 @@ delegate@^3.1.2:
   resolved "https://registry.npmmirror.com/delegate/-/delegate-3.2.0.tgz#b66b71c3158522e8ab5744f720d8ca0c2af59166"
   integrity sha512-IofjkYBZaZivn0V8nnsMJGBr4jVLxHDheKSW88PyxS5QC4Vo9ZbZVvhzlSxY87fVq3STR6r+4cGepyHkcWOQSw==
 
+dexie@^3.2.2:
+  version "3.2.2"
+  resolved "https://registry.npmmirror.com/dexie/-/dexie-3.2.2.tgz#fa6f2a3c0d6ed0766f8d97a03720056f88fe0e01"
+  integrity sha512-q5dC3HPmir2DERlX+toCBbHQXW5MsyrFqPFcovkH9N2S/UW/H3H5AWAB6iEOExeraAu+j+zRDG+zg/D7YhH0qg==
+
 dom-align@^1.12.1:
   version "1.12.3"
   resolved "https://registry.npmmirror.com/dom-align/-/dom-align-1.12.3.tgz#a36d02531dae0eefa2abb0c4db6595250526f103"
@@ -852,6 +857,11 @@ vue-json-viewer@3:
   integrity sha512-pnC080rTub6YjccthVSNQod2z9Sl5IUUq46srXtn6rxwhW8QM4rlYn+CTSLFKXWfw+N3xv77Cioxw7B4XUKIbQ==
   dependencies:
     clipboard "^2.0.4"
+
+vue-request@^1.2.4:
+  version "1.2.4"
+  resolved "https://registry.npmmirror.com/vue-request/-/vue-request-1.2.4.tgz#02ab150cc2903605464e6efcb501c480d9dd536f"
+  integrity sha512-i+i+6Fog6F8EtYUeueumzKS9Sg06CvjsMXH8TK0YSBxY4sDxIJ+snTEke5rLqiV9d19DTuJOxPQFjTBUpsMtXA==
 
 vue-router@^4.1.0:
   version "4.1.0"

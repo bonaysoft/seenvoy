@@ -1,6 +1,7 @@
 <script>
 import { defineComponent, watch, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { sync_config } from './libs/envoy';
 export default defineComponent({
     setup() {
         const route = useRoute();
@@ -9,13 +10,25 @@ export default defineComponent({
             router.push({ name: e.key })
         };
 
+        const lastSync = ref('');
+        const onSync = (e) => {
+            console.log(e);
+            sync_config(true).then(() => {
+                console.log('sync success');
+                localStorage.setItem("lastSync", new Date().toISOString());
+            });
+        };
+
         const selectedKeys = ref([]);
         watch(route, (to) => {
             selectedKeys.value = [to.name]
+            lastSync.value = localStorage.getItem("lastSync");
         })
         return {
             selectedKeys,
             handleClick,
+            lastSync,
+            onSync,
         };
     },
 });
@@ -34,6 +47,9 @@ export default defineComponent({
                 <a-menu-item key="Clusters">Clusters</a-menu-item>
                 <!-- <a-menu-item key="Endpoints">Endpoints</a-menu-item> -->
             </a-menu>
+            <div style="float: right">
+                LastSync: {{ lastSync }} <a-button size="small" @click="onSync">Sync</a-button>
+            </div>
         </a-layout-header>
         <a-layout-content :style="{ padding: '0 50px', marginTop: '84px' }">
             <div :style="{ background: '#fff', padding: '24px', minHeight: '900px' }">
@@ -71,5 +87,4 @@ body {
     float: right;
     margin: 16px 0 16px 24px;
 }
-
 </style>

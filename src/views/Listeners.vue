@@ -1,25 +1,59 @@
 <script >
-import { onMounted, onUnmounted } from '@vue/runtime-core';
 import { listenerConfigs } from '../libs/envoy';
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, computed } from 'vue';
 import { openDrawer } from '~/libs/drawer';
 import JSONViewer from '../components/JSONViewer.vue';
 import Graph from '../components/Graph.vue';
 import { useRouter } from 'vue-router';
+import { usePaginationS } from '~/libs/pagination';
+const columns = [
+  {
+    title: 'Name',
+    dataIndex: 'name',
+    key: 'name',
+  },
+  {
+    title: 'PORT',
+    dataIndex: ['address', 'socket_address', 'port_value'],
+    key: 'port',
+  },
+  {
+    title: 'DIRECTION',
+    dataIndex: 'traffic_direction',
+    key: 'direction',
+  },
+  {
+    title: 'Opeartion',
+    key: 'action',
+  },
+]
+const innerColumns = [{
+  title: 'FilterName',
+  dataIndex: 'name',
+},
+{
+  title: 'Match',
+  dataIndex: 'match',
+},
+{
+  title: 'To',
+  dataIndex: 'totype',
+},
+{
+  title: 'DESTINATION',
+  dataIndex: 'destination',
+  key: 'destination',
+}]
+
 export default defineComponent({
   setup() {
-    const dataSource = ref([])
-    onMounted(() => {
-      listenerConfigs().then(data => {
-        console.log(data);
-        dataSource.value = data.map(el => {
-          el.name = el.name || `${el.address.socket_address.address}_${el.address.socket_address.port_value}`;
-          el.key = el.name
-          el.traffic_direction = el.traffic_direction || 'UNSPECIFIED'
-          return el
-        })
-      });
-    });
+    const { data, pagination, handleTableChange } = usePaginationS(listenerConfigs)
+    const dataSource = computed(() => data.value?.items.map(el => {
+      el.name = el.name || `${el.address.socket_address.address}_${el.address.socket_address.port_value}`;
+      el.key = el.name
+      el.traffic_direction = el.traffic_direction || 'UNSPECIFIED'
+      return el
+    }));
 
     const matchFormat = (filter_chain_match) => {
       if (!filter_chain_match || Object.keys(filter_chain_match) == 0) return 'ALL'
@@ -88,51 +122,10 @@ export default defineComponent({
       onDestinationClick,
       inner_format,
       dataSource,
-      columns: [
-        {
-          title: 'Name',
-          dataIndex: 'name',
-          key: 'name',
-        },
-        {
-          title: 'PORT',
-          dataIndex: ['address', 'socket_address', 'port_value'],
-          key: 'port',
-        },
-        {
-          title: 'DIRECTION',
-          dataIndex: 'traffic_direction',
-          key: 'direction',
-        },
-        {
-          title: 'Opeartion',
-          key: 'action',
-        },
-      ],
-      innerColumns: [{
-        title: 'FilterName',
-        dataIndex: 'name',
-      },
-      {
-        title: 'Match',
-        dataIndex: 'match',
-      },
-      {
-        title: 'To',
-        dataIndex: 'totype',
-      },
-      {
-        title: 'DESTINATION',
-        dataIndex: 'destination',
-        key: 'destination',
-      }],
-      pagination: {
-        total: dataSource.value.length,
-        pageSize: 20,
-        showSizeChanger: true,
-        pageSizeOptions: ["10", "20", "50", "100"],
-        showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
-      },
+      columns,
+      innerColumns,
+      pagination,
+      handleTableChange,
     }
   },
 });
@@ -155,7 +148,7 @@ export default defineComponent({
       </a-form-item>
     </a-form>
 
-    <a-table :dataSource="dataSource" :columns="columns" :pagination="pagination">
+    <a-table :dataSource="dataSource" :columns="columns" :pagination="pagination" @change="handleTableChange">
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
           <a-space>

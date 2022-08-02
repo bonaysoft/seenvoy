@@ -1,18 +1,18 @@
 <script >
 import { onMounted, onUnmounted } from '@vue/runtime-core';
 import { buildEndpointName, clusterConfigs, clusterStatuses, endpointConfigs } from '../libs/envoy';
-import { defineComponent, ref, watch } from 'vue';
+import { defineComponent, ref, computed, watch } from 'vue';
 import { openDrawer } from '~/libs/drawer';
 import JSONViewer from '../components/JSONViewer.vue';
 import { useRoute } from 'vue-router';
+import { usePaginationS } from '~/libs/pagination';
 export default defineComponent({
   setup() {
     const route = useRoute();
-    const dataSource = ref([])
-    const dataRefresh = async (search) => {
-      const eds = await endpointConfigs();
+    const dataRefresh = async (param) => {
+      const eds = await endpointConfigs({ page_no: 1, page_size: 5000 });
       let epConfigs = []
-      eds.forEach(ed => {
+      eds.items.forEach(ed => {
         ed.endpoints?.forEach(el => {
           el.lb_endpoints.forEach(ep => {
             if (!epConfigs[ed.cluster_name]) {
@@ -23,26 +23,31 @@ export default defineComponent({
         });
       });
 
-      const statuses = await clusterStatuses();
+      const statuses = await clusterStatuses({ page_no: 1, page_size: 5000 });
       let clusterEndpoints = []
+      console.log(123, statuses);
       statuses.forEach(el => {
         el.host_statuses?.map(endpoint => {
-          endpoint.config = epConfigs[el.name][buildEndpointName(endpoint)]
+          endpoint.config = (epConfigs[el.name]) ? epConfigs[el.name][buildEndpointName(endpoint)] : [];
         })
         clusterEndpoints[el.name] = el
       });
+      console.log(221, clusterEndpoints);
 
-      let data = await clusterConfigs()
-      data = search.name ? data.filter(el => el.name == search.name) : data
-      dataSource.value = data.map((el, idx) => {
-        return { key: idx, cluster: el, endpoint: clusterEndpoints[el.name], endpoints_count: clusterEndpoints[el.name].host_statuses?.length || 0 }
-      })
-      console.log(dataSource.value);
+      let data = await clusterConfigs(param)
+      return {
+        data: data.items.map((el, idx) => {
+          return { key: idx, cluster: el, endpoint: clusterEndpoints[el.name], endpoints_count: clusterEndpoints[el.name].host_statuses?.length || 0 }
+        }),
+        total: data.total
+      }
     };
 
-    onMounted(() => dataRefresh(route.query));
-    watch(route, (to) => dataRefresh(to.query))
-    const onSearch = (search) => dataRefresh(search)
+    const { data, pagination, handleTableChange, run } = usePaginationS(dataRefresh)
+    const onSearch = (search) => run(search)
+    const dataSource = computed(() => {
+      return data.value?.data
+    });
 
     const openJSONDrawer = (row) => {
       openDrawer(JSONViewer, {
@@ -51,7 +56,6 @@ export default defineComponent({
     }
 
     const inner_format = (endpoint) => {
-      console.log(endpoint);
       return endpoint.host_statuses?.map(el => {
         return {
           locality: Object.values(el.locality).join('/') || '-',
@@ -110,12 +114,8 @@ export default defineComponent({
         title: 'Opeartion',
         key: 'action',
       },],
-      pagination: {
-        pageSize: 50,
-        showSizeChanger: true,
-        pageSizeOptions: ["10", "20", "50", "100"],
-        showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
-      },
+      pagination,
+      handleTableChange,
     };
   },
 });
@@ -133,7 +133,8 @@ export default defineComponent({
       </a-form-item>
     </a-form>
 
-    <a-table :dataSource="dataSource" :columns="columns" :pagination="pagination" :defaultExpandedRowKeys="[0]">
+    <a-table :dataSource="dataSource" :columns="columns" :pagination="pagination" :defaultExpandedRowKeys="[0]"
+      @change="handleTableChange">
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
           <a @click="openJSONDrawer(record.cluster)">View</a>
