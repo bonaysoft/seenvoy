@@ -117,12 +117,12 @@ export default defineComponent({
 
 <template>
   <div style="height: 100%">
-    <a-form layout="inline" :model="search">
+    <a-form layout="inline" :model="search" @submit="onSearch(search)">
       <a-form-item label="Name">
-        <a-input style="width: 120px" v-model:value="search.name"> </a-input>
+        <a-input style="width: 200px" v-model:value="search.name"> </a-input>
       </a-form-item>
       <a-form-item>
-        <a-button type="primary" @click="onSearch(search)">Search</a-button>
+        <a-button type="primary" html-type="submit">Search</a-button>
       </a-form-item>
     </a-form>
 

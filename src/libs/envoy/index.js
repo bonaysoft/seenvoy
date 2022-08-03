@@ -67,7 +67,10 @@ export class Configs {
         const configs = [];
         lcd.static_listeners.forEach(ln => { ln.listener._static = true; configs.push(ln.listener) })
         lcd.dynamic_listeners.forEach(item => { configs.push(item.active_state.listener) })
-        return configs
+        return configs.map(el => {
+            el.traffic_direction = el.traffic_direction || 'UNSPECIFIED'
+            return el;
+        })
     }
     getRouteConfigs() {
         const rcd = this.configs.find(d => d["@type"].endsWith("v3.RoutesConfigDump"))

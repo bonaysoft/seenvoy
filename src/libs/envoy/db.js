@@ -1,9 +1,9 @@
 import Dexie from 'dexie';
 
 export const db = new Dexie('seenvoy');
-db.version(6).stores({
+db.version(7).stores({
     bootstrap: '++',
-    listeners: '++, name, _static',
+    listeners: '++, name, _static, traffic_direction, address.socket_address.port_value',
     routes: '++, name, _static',
     clusters: '++, name, _static',
     endpoints: '++, name, cluster_name, _static',
@@ -17,11 +17,15 @@ export const query = async (table, param) => {
 
     let sometable = db[table]
     if (param.name) {
-        sometable = sometable.where("name").equalsIgnoreCase(param.name)
+        sometable = sometable.filter(el => el.name?.includes(param.name))
+    }
+    if (param.direction) {
+        sometable = sometable.filter(el => el.traffic_direction === param.direction)
     }
 
-    const configs = await sometable.offset(offset).limit(page_size).toArray()
-    return { items: configs, total: await sometable.count() }
+    const total = await sometable.count();
+    const items = await sometable.offset(offset).limit(page_size).toArray()
+    return { items, total  }
 }
 
 export const count = async (table) => {

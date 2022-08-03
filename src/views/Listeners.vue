@@ -47,11 +47,11 @@ const innerColumns = [{
 
 export default defineComponent({
   setup() {
-    const { data, pagination, loading, handleTableChange } = usePaginationS(listenerConfigs)
+    const { data, pagination, loading, run, handleTableChange } = usePaginationS(listenerConfigs)
+    const onSearch = (search) => run(search)
     const dataSource = computed(() => data.value?.items.map(el => {
       el.name = el.name || `${el.address.socket_address.address}_${el.address.socket_address.port_value}`;
       el.key = el.name
-      el.traffic_direction = el.traffic_direction || 'UNSPECIFIED'
       return el
     }));
 
@@ -115,11 +115,12 @@ export default defineComponent({
     }
 
     return {
-      search: ref({}),
+      search: ref({ direction: '' }),
       listeners: ref([]),
       clusters: ref([]),
       openDrawerWith,
       onDestinationClick,
+      onSearch,
       inner_format,
       dataSource,
       columns,
@@ -135,17 +136,20 @@ export default defineComponent({
 
 <template>
   <div style="height: 100%">
-    <a-form layout="inline" :model="search">
-      <a-form-item label="Listener">
-        <a-select ref="select" style="width: 120px" v-model:value="search.listener" :options="listeners">
+    <a-form layout="inline" :model="search" @submit="onSearch(search)">
+      <a-form-item label="Direction">
+        <a-select ref="select" style="width: 150px" v-model:value="search.direction">
+          <a-select-option value="">ALL</a-select-option>
+          <a-select-option value="INBOUND">INBOUND</a-select-option>
+          <a-select-option value="OUTBOUND">OUTBOUND</a-select-option>
+          <a-select-option value="UNSPECIFIED">UNSPECIFIED</a-select-option>
         </a-select>
       </a-form-item>
-      <a-form-item label="Cluster">
-        <a-select ref="select" style="width: 120px" v-model:value="search.cluster" :options="clusters">
-        </a-select>
+      <a-form-item label="Name">
+        <a-input style="width: 200px" v-model:value="search.name"> </a-input>
       </a-form-item>
       <a-form-item>
-        <a-button type="primary">Search</a-button>
+        <a-button type="primary" html-type="submit">Search</a-button>
       </a-form-item>
     </a-form>
 

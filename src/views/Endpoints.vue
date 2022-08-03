@@ -50,20 +50,6 @@ export default defineComponent({
 
 <template>
   <div style="height: 100%">
-    <a-form layout="inline" :model="search">
-      <a-form-item label="Listener">
-        <a-select ref="select" style="width: 120px" v-model:value="search.listener" :options="listeners">
-        </a-select>
-      </a-form-item>
-      <a-form-item label="Cluster">
-        <a-select ref="select" style="width: 120px" v-model:value="search.cluster" :options="clusters">
-        </a-select>
-      </a-form-item>
-      <a-form-item>
-        <a-button type="primary">Search</a-button>
-      </a-form-item>
-    </a-form>
-
     <a-table :dataSource="dataSource" :columns="columns">
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
