@@ -1,7 +1,15 @@
 <script>
+import { message } from 'ant-design-vue';
 import { defineComponent, watch, ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { sync_config_dump } from './libs/envoy';
+
+message.config({
+    top: '80px',
+    duration: 2,
+    maxCount: 3,
+});
+
 export default defineComponent({
     setup() {
         const route = useRoute();
@@ -17,16 +25,18 @@ export default defineComponent({
             console.log(e);
             loading.value = true;
             sync_config_dump(true).then(() => {
-                console.log('sync success');
+                message.success('ConfigDump Sync Done.')
                 lastSync.value = new Date().toLocaleString()
                 localStorage.setItem("lastSync", lastSync.value);
                 loading.value = false;
                 spinning.value = false
+                location.reload();
             });
         };
 
         onMounted(() => {
             if (!lastSync.value) {
+                message.info('ConfigDump Syncing...')
                 spinning.value = true
                 onSync()
             }

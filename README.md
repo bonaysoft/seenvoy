@@ -22,9 +22,15 @@ Routes
 
 ## Installation
 
-### Recommand
-```go
+### Homebrew (Recommanded)
+
+```bash
 brew install saltbo/bin/seenvoy
+```
+
+### GoDeveloper
+```go
+go install github.com/saltbo/seenvoy
 ```
 
 ### Manually

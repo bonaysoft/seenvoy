@@ -13,6 +13,8 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+//go:generate yarn
+//go:generate yarn build
 //go:embed dist/*
 var embedFs embed.FS
 
