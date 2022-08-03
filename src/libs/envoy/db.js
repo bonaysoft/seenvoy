@@ -1,12 +1,12 @@
 import Dexie from 'dexie';
 
 export const db = new Dexie('seenvoy');
-db.version(5).stores({
+db.version(6).stores({
     bootstrap: '++',
     listeners: '++, name, _static',
     routes: '++, name, _static',
     clusters: '++, name, _static',
-    endpoints: '++, name, _static',
+    endpoints: '++, name, cluster_name, _static',
 });
 
 export const query = async (table, param) => {

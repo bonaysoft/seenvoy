@@ -10,8 +10,9 @@ export const fetch_config_dump = async (include_eds) => {
     return (await axios.get(url)).data.configs.map(config => { config.key = config["@type"]; return config })
 }
 
-export const save_config_dump = async (include_eds) => {
+export const sync_config_dump = async (include_eds) => {
     const configs = await fetch_config_dump(include_eds);
+    console.log(configs);
     const cfg = new Configs(configs)
 
     try {

@@ -1,7 +1,7 @@
 <script >
 import { defineComponent, ref } from 'vue';
 import { onMounted, onUnmounted } from '@vue/runtime-core';
-import { config_dump, useConfigRelationship } from '../libs/envoy';
+import { useConfigRelationship } from '../libs/envoy';
 import { useGraph } from '../libs/echarts';
 export default defineComponent({
   props: {
@@ -13,8 +13,8 @@ export default defineComponent({
     onMounted(async () => {
       console.log(112233, props.modelValue);
       const cfg = props.modelValue;
-      const cd = await config_dump(true)
-      const rdata = useConfigRelationship(cfg, cd);
+      // const cd = await config_dump(true)
+      const rdata = await useConfigRelationship(cfg, []);
       console.log(2233, rdata);
 
       let tMap = {}

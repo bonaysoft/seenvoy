@@ -1,7 +1,7 @@
 <script>
 import { defineComponent, watch, ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { sync_config } from './libs/envoy';
+import { sync_config_dump } from './libs/envoy';
 export default defineComponent({
     setup() {
         const route = useRoute();
@@ -16,7 +16,7 @@ export default defineComponent({
         const onSync = (e) => {
             console.log(e);
             loading.value = true;
-            sync_config(true).then(() => {
+            sync_config_dump(true).then(() => {
                 console.log('sync success');
                 lastSync.value = new Date().toLocaleString()
                 localStorage.setItem("lastSync", lastSync.value);
