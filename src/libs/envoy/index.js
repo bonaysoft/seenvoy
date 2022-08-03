@@ -1,7 +1,7 @@
 import axios from "./axios";
-import { db } from "./db";
+import { count, db, query } from "./db";
 
-export const config_dump = async (include_eds) => {
+export const fetch_config_dump = async (include_eds) => {
     let url = "/config_dump";
     if (include_eds) {
         url += "?include_eds";
@@ -10,16 +10,16 @@ export const config_dump = async (include_eds) => {
     return (await axios.get(url)).data.configs.map(config => { config.key = config["@type"]; return config })
 }
 
-export const sync_config = async (include_eds) => {
-    const configs = await config_dump(include_eds);
+export const save_config_dump = async (include_eds) => {
+    const configs = await fetch_config_dump(include_eds);
     const cfg = new Configs(configs)
-    await db.bootstrap.clear()
-    await db.listeners.clear()
-    await db.routes.clear()
-    await db.clusters.clear()
-    await db.endpoints.clear()
 
     try {
+        await db.bootstrap.clear()
+        await db.listeners.clear()
+        await db.routes.clear()
+        await db.clusters.clear()
+        await db.endpoints.clear()
         await db.bootstrap.add(cfg.getBootstrapConfig());
         await db.listeners.bulkAdd(cfg.getListenerConfigs())
         await db.routes.bulkAdd(cfg.getRouteConfigs())
@@ -30,40 +30,13 @@ export const sync_config = async (include_eds) => {
     }
 }
 
-export const config_dump_cache = async (key) => {
-    console.log('start', key);
-    const ret = await db.configs.get({ "key": key })
-    console.log('end', ret);
-    return ret
-}
-
 export const statistic = async () => {
-    // const lcd = await config_dump_cache("type.googleapis.com/envoy.admin.v3.ListenersConfigDump")
-    // const rcd = await config_dump_cache("type.googleapis.com/envoy.admin.v3.RoutesConfigDump")
-    // const ccd = await config_dump_cache("type.googleapis.com/envoy.admin.v3.ClustersConfigDump")
-    // const ecd = await config_dump_cache("type.googleapis.com/envoy.admin.v3.EndpointsConfigDump")
-
     return {
-        listeners: { static: lcd.static_listeners.length, dynamic: lcd.dynamic_listeners.length },
-        routes: { static: rcd.static_route_configs.length, dynamic: rcd.dynamic_route_configs.length },
-        clusters: { static: ccd.static_clusters.length, dynamic: ccd.dynamic_active_clusters.length },
-        endpoints: { static: ecd.static_endpoint_configs.length, dynamic: ecd.dynamic_endpoint_configs.length },
+        listeners: await count('listeners'),
+        routes: await count('routes'),
+        clusters: await count('clusters'),
+        endpoints: await count('endpoints'),
     }
-}
-
-export const query = async (table, param) => {
-    param.page_no = param.page_no || 1
-    param.page_size = param.page_size || 20
-    const { page_no, page_size } = param
-    const offset = (page_no - 1) * page_size
-
-    let sometable = db[table]
-    if (param.name) {
-        sometable = sometable.where("name").equalsIgnoreCase(param.name)
-    }
-
-    const configs = await sometable.offset(offset).limit(page_size).toArray()
-    return { items: configs, total: await sometable.count() }
 }
 
 export const bootstrapConfig = async () => {
@@ -78,6 +51,8 @@ export const clusterConfigs = async (param) => { return query('clusters', param)
 
 export const endpointConfigs = async (param) => { return query('endpoints', param) }
 
+export const inject = (key, value) => { return (el) => { el[key] = value; return el } }
+
 export class Configs {
     configs;
     constructor(configs) {
@@ -89,28 +64,28 @@ export class Configs {
     getListenerConfigs() {
         const lcd = this.configs.find(d => d["@type"].endsWith("ListenersConfigDump"))
         const configs = [];
-        lcd.static_listeners.forEach(ln => { configs.push(ln.listener) })
+        lcd.static_listeners.forEach(ln => { ln.listener._static = true; configs.push(ln.listener) })
         lcd.dynamic_listeners.forEach(item => { configs.push(item.active_state.listener) })
         return configs
     }
     getRouteConfigs() {
         const rcd = this.configs.find(d => d["@type"].endsWith("v3.RoutesConfigDump"))
         const configs = [];
-        rcd.static_route_configs.forEach(item => { configs.push(item.route_config) })
+        rcd.static_route_configs.forEach(item => { item.route_config._static = true; configs.push(item.route_config) })
         rcd.dynamic_route_configs.forEach(item => { configs.push(item.route_config) })
         return configs
     }
     getClusterConfigs() {
         const ccd = this.configs.find(d => d["@type"].endsWith("v3.ClustersConfigDump"))
         const configs = [];
-        ccd.static_clusters.forEach(item => { configs.push(item.cluster) })
+        ccd.static_clusters.forEach(item => { item.cluster._static = true; configs.push(item.cluster) })
         ccd.dynamic_active_clusters.forEach(item => { configs.push(item.cluster) })
         return configs
     }
     getEndpointConfigs() {
         const ecd = this.configs.find(d => d["@type"].endsWith("v3.EndpointsConfigDump"))
         const configs = [];
-        ecd.static_endpoint_configs.forEach(item => { configs.push(item.endpoint_config) })
+        ecd.static_endpoint_configs.forEach(item => { item.endpoint_config._static = true; configs.push(item.endpoint_config) })
         ecd.dynamic_endpoint_configs.forEach(item => { configs.push(item.endpoint_config) })
         return configs
     }

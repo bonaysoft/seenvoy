@@ -8,7 +8,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { usePaginationS } from '~/libs/pagination';
 export default defineComponent({
   setup() {
-    const { data, pagination, handleTableChange, run } = usePaginationS(routeConfigs)
+    const { data, pagination, loading, handleTableChange, run } = usePaginationS(routeConfigs)
     const onSearch = (search) => run(search)
     const dataSource = computed(() => {
       return data.value?.items.map((el, idx) => { el.key = idx; return el })
@@ -106,6 +106,7 @@ export default defineComponent({
           width: 80,
         },
       ],
+      loading,
       pagination,
       handleTableChange
     };
@@ -125,7 +126,7 @@ export default defineComponent({
       </a-form-item>
     </a-form>
 
-    <a-table :dataSource="dataSource" :columns="columns" :pagination="pagination" :defaultExpandedRowKeys="[0]"
+    <a-table :dataSource="dataSource" :columns="columns" :loading="loading" :pagination="pagination" :defaultExpandedRowKeys="[0]"
       @change="handleTableChange">
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">

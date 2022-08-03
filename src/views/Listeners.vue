@@ -47,7 +47,7 @@ const innerColumns = [{
 
 export default defineComponent({
   setup() {
-    const { data, pagination, handleTableChange } = usePaginationS(listenerConfigs)
+    const { data, pagination, loading, handleTableChange } = usePaginationS(listenerConfigs)
     const dataSource = computed(() => data.value?.items.map(el => {
       el.name = el.name || `${el.address.socket_address.address}_${el.address.socket_address.port_value}`;
       el.key = el.name
@@ -124,6 +124,7 @@ export default defineComponent({
       dataSource,
       columns,
       innerColumns,
+      loading,
       pagination,
       handleTableChange,
     }
@@ -148,7 +149,8 @@ export default defineComponent({
       </a-form-item>
     </a-form>
 
-    <a-table :dataSource="dataSource" :columns="columns" :pagination="pagination" @change="handleTableChange">
+    <a-table :dataSource="dataSource" :columns="columns" :loading="loading" :pagination="pagination"
+      @change="handleTableChange">
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
           <a-space>

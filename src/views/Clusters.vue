@@ -4,11 +4,9 @@ import { buildEndpointName, clusterConfigs, clusterStatuses, endpointConfigs } f
 import { defineComponent, ref, computed, watch } from 'vue';
 import { openDrawer } from '~/libs/drawer';
 import JSONViewer from '../components/JSONViewer.vue';
-import { useRoute } from 'vue-router';
 import { usePaginationS } from '~/libs/pagination';
 export default defineComponent({
   setup() {
-    const route = useRoute();
     const dataRefresh = async (param) => {
       const eds = await endpointConfigs({ page_no: 1, page_size: 5000 });
       let epConfigs = []
@@ -25,14 +23,12 @@ export default defineComponent({
 
       const statuses = await clusterStatuses({ page_no: 1, page_size: 5000 });
       let clusterEndpoints = []
-      console.log(123, statuses);
       statuses.forEach(el => {
         el.host_statuses?.map(endpoint => {
           endpoint.config = (epConfigs[el.name]) ? epConfigs[el.name][buildEndpointName(endpoint)] : [];
         })
         clusterEndpoints[el.name] = el
       });
-      console.log(221, clusterEndpoints);
 
       let data = await clusterConfigs(param)
       return {
@@ -43,7 +39,7 @@ export default defineComponent({
       }
     };
 
-    const { data, pagination, handleTableChange, run } = usePaginationS(dataRefresh)
+    const { data, pagination, loading, handleTableChange, run } = usePaginationS(dataRefresh)
     const onSearch = (search) => run(search)
     const dataSource = computed(() => {
       return data.value?.data
@@ -114,6 +110,7 @@ export default defineComponent({
         title: 'Opeartion',
         key: 'action',
       },],
+      loading,
       pagination,
       handleTableChange,
     };
@@ -133,7 +130,7 @@ export default defineComponent({
       </a-form-item>
     </a-form>
 
-    <a-table :dataSource="dataSource" :columns="columns" :pagination="pagination" :defaultExpandedRowKeys="[0]"
+    <a-table :dataSource="dataSource" :columns="columns" :loading="loading" :pagination="pagination" :defaultExpandedRowKeys="[0]"
       @change="handleTableChange">
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
