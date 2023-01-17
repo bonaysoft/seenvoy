@@ -65,8 +65,12 @@ export class Configs {
     getListenerConfigs() {
         const lcd = this.configs.find(d => d["@type"].endsWith("ListenersConfigDump"))
         const configs = [];
-        lcd.static_listeners.forEach(ln => { ln.listener._static = true; configs.push(ln.listener) })
-        lcd.dynamic_listeners.forEach(item => { configs.push(item.active_state.listener) })
+        if(lcd.hasOwnProperty('static_listeners')){
+            lcd.static_listeners.forEach(ln => { ln.listener._static = true; configs.push(ln.listener) })
+        }
+        if(lcd.hasOwnProperty('dynamic_listeners')){
+            lcd.dynamic_listeners.forEach(item => { configs.push(item.active_state.listener) })
+        }
         return configs.map(el => {
             el.traffic_direction = el.traffic_direction || 'UNSPECIFIED'
             return el;
@@ -75,22 +79,34 @@ export class Configs {
     getRouteConfigs() {
         const rcd = this.configs.find(d => d["@type"].endsWith("v3.RoutesConfigDump"))
         const configs = [];
-        rcd.static_route_configs.forEach(item => { item.route_config._static = true; configs.push(item.route_config) })
-        rcd.dynamic_route_configs.forEach(item => { configs.push(item.route_config) })
+        if(rcd.hasOwnProperty('static_route_configs')){
+            rcd.static_route_configs.forEach(item => { item.route_config._static = true; configs.push(item.route_config) })
+        }
+        if(rcd.hasOwnProperty('dynamic_route_configs')){
+            rcd.dynamic_route_configs.forEach(item => { configs.push(item.route_config) })
+        }
         return configs
     }
     getClusterConfigs() {
         const ccd = this.configs.find(d => d["@type"].endsWith("v3.ClustersConfigDump"))
         const configs = [];
-        ccd.static_clusters.forEach(item => { item.cluster._static = true; configs.push(item.cluster) })
-        ccd.dynamic_active_clusters.forEach(item => { configs.push(item.cluster) })
+        if(ccd.hasOwnProperty('static_clusters')){
+            ccd.static_clusters.forEach(item => { item.cluster._static = true; configs.push(item.cluster) })
+        }
+        if(ccd.hasOwnProperty('dynamic_active_clusters')){
+            ccd.dynamic_active_clusters.forEach(item => { configs.push(item.cluster) })
+        }
         return configs
     }
     getEndpointConfigs() {
         const ecd = this.configs.find(d => d["@type"].endsWith("v3.EndpointsConfigDump"))
         const configs = [];
-        ecd.static_endpoint_configs.forEach(item => { item.endpoint_config._static = true; configs.push(item.endpoint_config) })
-        ecd.dynamic_endpoint_configs.forEach(item => { configs.push(item.endpoint_config) })
+        if(ecd.hasOwnProperty('static_endpoint_configs')){
+            ecd.static_endpoint_configs.forEach(item => { item.endpoint_config._static = true; configs.push(item.endpoint_config) })
+        }
+        if(ecd.hasOwnProperty('dynamic_endpoint_configs')){
+            ecd.dynamic_endpoint_configs.forEach(item => { configs.push(item.endpoint_config) })
+        }
         return configs
     }
 }
