@@ -53,7 +53,7 @@ export const build = (domid, data) => {
                 {
                     x: 'right',
                     show: true,
-                    data: ['listener', 'route', 'cluster', 'endpoint']
+                    data: ['listener', 'route', 'cluster', 'endpoint', 'directResponse']
                 }
             ],
             // animation: false,
@@ -66,7 +66,8 @@ export const build = (domid, data) => {
                         { name: 'listener', symbolSize: 180 },
                         { name: 'route', symbolSize: 120 },
                         { name: 'cluster', symbolSize: 60 },
-                        { name: 'endpoint', symbolSize: 30 }
+                        { name: 'endpoint', symbolSize: 30 },
+                        { name: 'directResponse', symbolSize: 30 }
                     ],
                     force: {
                         repulsion: [1000, 1200], //每个节点之间的斥力因子，越大离的越远

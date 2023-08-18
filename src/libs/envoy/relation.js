@@ -39,6 +39,12 @@ const typeHandlers = {
 
         for (const route of config.virtual_hosts) {
             for (const route_entry of route.routes) {
+                if (route_entry.direct_response){
+                    const dr = route_entry.direct_response
+                    result.push({ source: `route: ${config.name}`, target: `directResponse: ${dr.status}`, value: 1 })
+                    continue
+                }
+
                 const target = route_entry.route.cluster
                 const links = await useConfigRelationship(await findTargetConfig({ type: 'cluster', value: target }))
                 result.push(...links)
