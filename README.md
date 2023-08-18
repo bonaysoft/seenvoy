@@ -30,7 +30,7 @@ brew install saltbo/bin/seenvoy
 
 ### GoDeveloper
 ```go
-go install github.com/saltbo/seenvoy
+go install github.com/saltbo/seenvoy@latest
 ```
 
 ### Manually
